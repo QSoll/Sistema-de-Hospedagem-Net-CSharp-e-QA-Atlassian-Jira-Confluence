@@ -35,11 +35,11 @@ O seu programa deverá:
 
     a- O método **ObterQuantidadeHospedes** deverá retornar:
 
-    **Quantidade total de hóspedes**
+       **Quantidade total de hóspedes**
   
     b- O método **CalcularValorDiaria** deverá retornar:
-    
-    **Valor da diária** (Dias reservados x valor da diária)
+
+       **Valor da diária** (Dias reservados x valor da diária)
 
 3. Caso seja feita uma reserva igual ou maior que 10 dias, deverá ser concedido um desconto de 10% no valor da diária.
 
