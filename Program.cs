@@ -1,25 +1,23 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
+using System.Threading;
 using DesafioProjetoHospedagem.Models;
+using Menus;
 
+// Listas principais
+List<EspacoHospedagem> espacos = new();
+List<Hospede> hospedes = new();
+List<Hospede> hospedesDaReserva = new();
+List<Reserva> reservas = new();
+
+Reserva? reservaSelecionada = null;
+
+// Configura UTF-8 para acentuação correta
 Console.OutputEncoding = Encoding.UTF8;
 
-// Cria os modelos de hóspedes e cadastra na lista de hóspedes
-List<Pessoa> hospedes = new List<Pessoa>();
+Console.Clear();
+Console.WriteLine("Iniciando sistema...");
+Thread.Sleep(2000);
 
-Pessoa p1 = new Pessoa(nome: "Hóspede 1");
-Pessoa p2 = new Pessoa(nome: "Hóspede 2");
-
-hospedes.Add(p1);
-hospedes.Add(p2);
-
-// Cria a suíte
-Suite suite = new Suite(tipoSuite: "Premium", capacidade: 2, valorDiaria: 30);
-
-// Cria uma nova reserva, passando a suíte e os hóspedes
-Reserva reserva = new Reserva(diasReservados: 5);
-reserva.CadastrarSuite(suite);
-reserva.CadastrarHospedes(hospedes);
-
-// Exibe a quantidade de hóspedes e o valor da diária
-Console.WriteLine($"Hóspedes: {reserva.ObterQuantidadeHospedes()}");
-Console.WriteLine($"Valor diária: {reserva.CalcularValorDiaria()}");
+// Chamada central do sistema
+MenuPrincipal.Exibir(espacos, hospedes, reservas, hospedesDaReserva, reservaSelecionada);

@@ -1,0 +1,8 @@
+{
+	"editor.defaultFormatter": "formulahendry.auto-close-tag",
+	"notebook.defaultFormatter": "formulahendry.auto-close-tag",
+	"[csharp]": {
+		"editor.defaultFormatter": "ms-dotnettools.csharp"
+	},
+	"editor.mouseWheelZoom": true
+}
