@@ -1,10 +1,14 @@
 using System;
+using DesafioProjetoHospedagem.Models;
+using DesafioProjetoHospedagem.Utils;
+
 
 namespace Menus;
 
 public static class MenuComprovantes
 {
-    public static void Exibir()
+    public static void Exibir(List<Reserva> reservas)
+
     {
         int opcao;
 
@@ -55,8 +59,26 @@ public static class MenuComprovantes
     private static void EmitirComprovanteReserva()
     {
         Console.Clear();
-        Console.WriteLine("Emitindo comprovante de reserva...");
-        Console.WriteLine("[Funcionalidade em construção]");
+        Console.WriteLine("=== EMISSÃO DE COMPROVANTE ===\n");
+
+        int? codigoReserva = EntradaHelper.LerInteiroComCancelamento("Digite o número da reserva");
+        if (codigoReserva == null)
+        {
+            Console.WriteLine("\nEmissão cancelada. Retornando ao menu...");
+            return;
+        }
+
+        // Aqui entraria sua lógica para localizar a reserva com esse ID.
+        // Exemplo (quando estiver implementado):
+        // var reserva = reservas.FirstOrDefault(r => r.Id == codigoReserva.Value);
+        // if (reserva == null) { ... }
+
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("\nEsta funcionalidade está em construção. Em breve você poderá emitir comprovantes detalhados aqui!");
+        Console.ResetColor();
+
+        Console.WriteLine("\nPressione qualquer tecla para continuar...");
         Console.ReadKey();
     }
+
 }

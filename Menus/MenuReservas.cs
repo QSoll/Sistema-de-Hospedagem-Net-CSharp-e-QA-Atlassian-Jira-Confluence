@@ -54,93 +54,132 @@ namespace Menus
         }
 
         private static void CriarReserva(List<Reserva> reservas, List<Hospede> hospedes, List<EspacoHospedagem> espacos)
+{
+    Console.Clear();
+    Console.WriteLine("=== CRIAÇÃO DE NOVA RESERVA ===\n");
+
+    if (!espacos.Any())
+    {
+        Console.WriteLine("Nenhum espaço cadastrado ainda.");
+        Console.ReadKey();
+        return;
+    }
+
+    var espacosDisponiveis = espacos
+        .Where(e => !reservas.Any(r => r.Ativa && r.Espaco.Id == e.Id))
+        .ToList();
+
+    if (!espacosDisponiveis.Any())
+    {
+        Console.WriteLine("Todos os espaços estão atualmente ocupados.");
+        Console.ReadKey();
+        return;
+    }
+
+    Console.WriteLine("Espaços disponíveis:");
+    for (int i = 0; i < espacosDisponiveis.Count; i++)
+    {
+        var e = espacosDisponiveis[i];
+        Console.WriteLine($"[{i + 1}] {e.NomeFantasia} (ID {e.Id:D3}) - R$ {e.ValorDiaria:F2}/dia");
+    }
+
+    int? escolha = EntradaHelper.LerInteiroComCancelamento("\nEscolha o espaço pelo número");
+    if (escolha == null || escolha < 1 || escolha > espacosDisponiveis.Count)
+    {
+        Console.WriteLine("\nReserva cancelada. Retornando ao menu...");
+        return;
+    }
+
+    var espacoSelecionado = espacosDisponiveis[escolha.Value - 1];
+
+    int? dias = EntradaHelper.LerInteiroComCancelamento("Quantos dias de hospedagem");
+    if (dias == null || dias <= 0)
+    {
+        Console.WriteLine("\nReserva cancelada. Retornando ao menu...");
+        return;
+    }
+
+    List<Hospede> hospedesDaReserva = new();
+    bool adicionarMais = true;
+
+    while (adicionarMais)
+    {
+        AdicionarHospede(hospedes, hospedesDaReserva);
+
+        Console.Write("\nDeseja adicionar outro hóspede? (s/n): ");
+        string? continuar = Console.ReadLine()?.Trim().ToLower();
+        adicionarMais = continuar == "s";
+    }
+
+    var novaReserva = new Reserva(hospedesDaReserva, espacoSelecionado, dias.Value);
+    reservas.Add(novaReserva);
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("\nReserva criada com sucesso!");
+    Console.WriteLine($"Espaço: {espacoSelecionado.NomeFantasia}");
+    Console.WriteLine($"Check-in: {novaReserva.DataCheckIn:dd/MM/yyyy}");
+    Console.WriteLine($"Total de hóspedes: {hospedesDaReserva.Count}");
+    Console.WriteLine($"Valor total estimado: R$ {novaReserva.CalcularValorDiaria():F2}");
+    Console.ResetColor();
+
+    // ✅Exibe o comprovante completo
+    GerarComprovante(novaReserva);
+
+    Console.WriteLine("\nPressione qualquer tecla para continuar...");
+    Console.ReadKey();
+}
+
+
+        private static void GerarComprovante(Reserva reserva)
         {
-            Console.Clear();
-            Console.WriteLine("=== CRIAÇÃO DE NOVA RESERVA ===\n");
+            SalvarComprovanteEmArquivo(reserva);
 
-            if (!espacos.Any())
-            {
-                Console.WriteLine("⚠️ Nenhum espaço cadastrado ainda.");
-                Console.ReadKey();
-                return;
-            }
-
-            var espacosDisponiveis = espacos
-                .Where(e => !reservas.Any(r => r.Ativa && r.Espaco.Id == e.Id))
-                .ToList();
-
-            if (!espacosDisponiveis.Any())
-            {
-                Console.WriteLine("Todos os espaços estão atualmente ocupados.");
-                Console.ReadKey();
-                return;
-            }
-
-            Console.WriteLine("Espaços disponíveis:");
-            for (int i = 0; i < espacosDisponiveis.Count; i++)
-            {
-                var e = espacosDisponiveis[i];
-                Console.WriteLine($"[{i + 1}] {e.NomeFantasia} (ID {e.Id}) - R$ {e.ValorDiaria:F2}/dia");
-            }
-
-            int escolha;
-            do
-            {
-                Console.Write("\nEscolha o espaço pelo número: ");
-            } while (!int.TryParse(Console.ReadLine(), out escolha) || escolha < 1 || escolha > espacosDisponiveis.Count);
-
-            var espacoSelecionado = espacosDisponiveis[escolha - 1];
-
-            Console.Write("Quantos dias de hospedagem? ");
-            int dias;
-            while (!int.TryParse(Console.ReadLine(), out dias) || dias <= 0)
-            {
-                Console.Write("Digite um número válido de dias: ");
-            }
-
-            List<Hospede> hospedesDaReserva = new();
-            bool adicionarMais = true;
-
-            while (adicionarMais)
-            {
-                AdicionarHospede(hospedes, hospedesDaReserva);
-
-                Console.Write("\nDeseja adicionar outro hóspede? (s/n): ");
-                string? continuar = Console.ReadLine()?.Trim().ToLower();
-                adicionarMais = continuar == "s";
-            }
-
-                        var novaReserva = new Reserva(espacoSelecionado, dias);
-                        foreach (var h in hospedesDaReserva)
-                            novaReserva.AdicionarHospede(h);
-
-                        reservas.Add(novaReserva);
-
-                        Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\n✅ Reserva criada com sucesso!");
-            Console.WriteLine($"Espaço: {espacoSelecionado.NomeFantasia}");
-            Console.WriteLine($"Check-in: {novaReserva.DataCheckIn:dd/MM/yyyy}");
-            Console.WriteLine($"Total de hóspedes: {hospedesDaReserva.Count}");
-            Console.WriteLine($"Valor total estimado: R$ {novaReserva.CalcularValorDiaria():F2}");
-            Console.ResetColor();
-
-            Console.WriteLine("\nPressione qualquer tecla para continuar...");
-            Console.ReadKey();
         }
 
+        private static void SalvarComprovanteEmArquivo(Reserva reserva)
+        {
+            string nomeArquivo = $"comprovante_{reserva.Espaco.NomeFantasia}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+            string caminhoCompleto = Path.Combine(Environment.CurrentDirectory, nomeArquivo);
+
+            using StreamWriter writer = new(caminhoCompleto);
+
+            writer.WriteLine("======= COMPROVANTE DE RESERVA =======");
+            writer.WriteLine($"Espaço reservado: {reserva.Espaco.NomeFantasia}");
+            writer.WriteLine($"Capacidade: {reserva.Espaco.Capacidade} pessoa(s)");
+            writer.WriteLine($"Valor da diária: {reserva.Espaco.ValorDiaria:C}");
+            writer.WriteLine();
+            writer.WriteLine($"Check-in: {reserva.DataCheckIn:dd/MM/yyyy}");
+            writer.WriteLine($"Duração: {reserva.DiasReservados} diária(s)");
+            writer.WriteLine($"Check-out: {reserva.DataCheckIn.AddDays(reserva.DiasReservados):dd/MM/yyyy}");
+            writer.WriteLine();
+            writer.WriteLine($"Quantidade de hóspedes: {reserva.Hospedes.Count}");
+            writer.WriteLine("Hóspedes:");
+            foreach (var h in reserva.Hospedes)
+            {
+                writer.WriteLine($"- {h.NomeCompleto} | {h.Email}");
+            }
+            writer.WriteLine();
+            writer.WriteLine($"Valor total da reserva: {reserva.CalcularValorDiaria():C}");
+            writer.WriteLine("======================================");
+            writer.WriteLine("Gerado automaticamente pelo sistema.");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"\nComprovante salvo como: {nomeArquivo}");
+            Console.ResetColor();
+        }
         private static void AdicionarHospede(List<Hospede> hospedesCadastrados, List<Hospede> hospedesDaReserva)
         {
             Console.Clear();
             Console.WriteLine("=== ADICIONAR HÓSPEDE À RESERVA ===\n");
 
-            Console.Write("Digite o nome completo do hóspede: ");
-            string? nomeCompleto = Console.ReadLine()?.Trim().ToUpperInvariant();
-
-            if (string.IsNullOrWhiteSpace(nomeCompleto))
+            string? nomeCompleto = EntradaHelper.LerTextoComCancelamento("Digite o nome completo do hóspede");
+            if (nomeCompleto == null)
             {
-                Console.WriteLine("⚠️ Nome inválido.");
+                Console.WriteLine("\nAção cancelada. Retornando ao menu anterior...");
                 return;
             }
+
+            nomeCompleto = nomeCompleto.Trim().ToUpperInvariant();
 
             var existente = hospedesCadastrados
                 .FirstOrDefault(h => h.NomeCompleto.ToUpperInvariant() == nomeCompleto);
@@ -159,17 +198,18 @@ namespace Menus
                 string? email;
                 do
                 {
-                    Console.Write("Informe o e-mail: ");
-                    email = Console.ReadLine()?.Trim();
+                    email = EntradaHelper.LerTextoComCancelamento("Informe o e-mail");
+                    if (email == null) return;
 
-                    if (string.IsNullOrWhiteSpace(email))
+                    if (!email.Contains("@") || !email.Contains(".") || email.StartsWith("@") || email.EndsWith("@"))
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("E-mail obrigatório.\n");
+                        Console.WriteLine("E-mail inválido. Tente novamente (ex: nome@dominio.com).");
                         Console.ResetColor();
+                        email = null;
                     }
 
-                } while (string.IsNullOrWhiteSpace(email));
+                } while (email == null);
 
                 var novoHospede = new Hospede(nome, sobrenome, email);
                 hospedesCadastrados.Add(novoHospede);
@@ -180,7 +220,6 @@ namespace Menus
                 Console.ResetColor();
             }
         }
-
         private static void SubMenuHospedes(Reserva reservaSelecionada, List<Hospede> hospedesCadastrados)
         {
             string? opcao;
@@ -203,12 +242,16 @@ namespace Menus
                     case "2":
                         if (reservaSelecionada.Hospedes.Any())
                         {
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.WriteLine("\nHóspedes atualmente na reserva:");
+                            Console.ResetColor();
+
                             foreach (var h in reservaSelecionada.Hospedes)
                             {
                                 Console.WriteLine($"- {h.NomeCompleto} ({h.Email})");
                             }
                         }
+
                         else
                         {
                             Console.WriteLine("\nNenhum hóspede ainda foi adicionado.");
@@ -228,6 +271,7 @@ namespace Menus
 
             } while (opcao != "0");
         }
+
         private static void ListarReservasAtivas(List<Reserva> reservas)
         {
             Console.Clear();
@@ -275,13 +319,14 @@ namespace Menus
                 Console.WriteLine($"[{i + 1}] {ativas[i].Espaco.NomeFantasia} | Check-in: {ativas[i].DataCheckIn:dd/MM/yyyy}");
             }
 
-            int escolha;
-            do
+            int? escolha = EntradaHelper.LerInteiroComCancelamento("\nEscolha uma reserva pelo número");
+            if (escolha == null || escolha < 1 || escolha > ativas.Count)
             {
-                Console.Write("\nEscolha uma reserva pelo número: ");
-            } while (!int.TryParse(Console.ReadLine(), out escolha) || escolha < 1 || escolha > ativas.Count);
+                Console.WriteLine("\nCancelamento abortado. Retornando ao menu...");
+                return;
+            }
 
-            var selecionada = ativas[escolha - 1];
+            var selecionada = ativas[escolha.Value - 1];
             selecionada.Ativa = false;
 
             Console.ForegroundColor = ConsoleColor.Red;
@@ -290,7 +335,6 @@ namespace Menus
             Console.WriteLine("\nPressione qualquer tecla para continuar...");
             Console.ReadKey();
         }
-
         private static void EncerrarReserva(List<Reserva> reservas)
         {
             Console.Clear();
@@ -310,13 +354,14 @@ namespace Menus
                 Console.WriteLine($"[{i + 1}] {ativas[i].Espaco.NomeFantasia} | Check-in: {ativas[i].DataCheckIn:dd/MM/yyyy}");
             }
 
-            int escolha;
-            do
+            int? escolha = EntradaHelper.LerInteiroComCancelamento("\nEscolha uma reserva para encerrar");
+            if (escolha == null || escolha < 1 || escolha > ativas.Count)
             {
-                Console.Write("\nEscolha uma reserva para encerrar: ");
-            } while (!int.TryParse(Console.ReadLine(), out escolha) || escolha < 1 || escolha > ativas.Count);
+                Console.WriteLine("\nEncerramento cancelado. Retornando ao menu...");
+                return;
+            }
 
-            var encerrada = ativas[escolha - 1];
+            var encerrada = ativas[escolha.Value - 1];
             encerrada.Ativa = false;
 
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -327,5 +372,6 @@ namespace Menus
             Console.WriteLine("\nPressione qualquer tecla para continuar...");
             Console.ReadKey();
         }
+
     }
 }

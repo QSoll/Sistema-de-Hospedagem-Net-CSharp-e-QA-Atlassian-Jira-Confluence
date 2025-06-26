@@ -77,12 +77,105 @@ namespace Menus
             int numeroDoTipo = espacos.Count(e => e.TipoEspaco == tipoEspaco) + 1;
             string nomeSugerido = $"{tipoEspaco} {numeroDoTipo}";
 
+            string usarNome;
+            int tentativasVazias = 0;
+            do
+            {
+                Console.Write($"\nDeseja usar o nome sugerido \"{nomeSugerido}\"? (S/N): ");
+                usarNome = Console.ReadLine()!.Trim().ToUpper();
+
+                if (string.IsNullOrEmpty(usarNome))
+                {
+                    tentativasVazias++;
+                    if (tentativasVazias >= 3)
+                    {
+                        Console.Write("Você pressionou Enter várias vezes. Deseja cancelar e voltar ao menu? (S/N): ");
+                        string voltar = Console.ReadLine()!.Trim().ToUpper();
+                        if (voltar == "S")
+                        {
+                            Console.WriteLine("\nRetornando ao menu...");
+                            return;
+                        }
+                        else
+                        {
+                            tentativasVazias = 0;
+                        }
+                    }
+                }
+            } while (usarNome != "S" && usarNome != "N");
+
+            string? nomeEspaco = (usarNome == "S")
+                ? nomeSugerido
+                : EntradaHelper.LerTextoComCancelamento($"Digite o nome fantasia do {tipoEspaco.ToUpper()}");
+
+            if (nomeEspaco == null) return;
+
+            int? capacidade = EntradaHelper.LerInteiroComCancelamento("Informe a capacidade de hóspedes");
+            if (capacidade == null) return;
+
+            decimal? diaria = EntradaHelper.LerDecimalComCancelamento("Informe o valor da diária (ex: 85.90)");
+            if (diaria == null) return;
+
+            int? quartos = EntradaHelper.LerInteiroComCancelamento("Quantidade de quartos");
+            if (quartos == null) return;
+
+            int? suites = EntradaHelper.LerInteiroComCancelamento("Quantos desses quartos possuem suíte?");
+            if (suites == null) return;
+
+            string? descricao = EntradaHelper.LerTextoComCancelamento("Digite uma breve descrição para este espaço");
+            if (descricao == null) return;
+
+            bool temSuite = suites > 0;
+
+            EspacoHospedagem novoEspaco = new EspacoHospedagem(
+                id: espacos.Count + 1,
+                tipoEspaco: tipoEspaco,
+                nomeFantasia: nomeEspaco,
+                capacidade: capacidade.Value,
+                valorDiaria: diaria.Value,
+                quantidadeQuartos: quartos.Value,
+                possuiSuite: temSuite,
+                descricao: descricao
+            );
+
+            espacos.Add(novoEspaco);
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\n{novoEspaco.Id:D3}-  {novoEspaco.TipoEspaco.ToUpper()} {novoEspaco.NomeFantasia} . Cadastro realizado com sucesso!");
+            Console.ResetColor();
+
+            Console.WriteLine("Pressione qualquer tecla para voltar ao menu...");
+            Console.ReadKey();
+        }
+
+
+        /*
+        private static void CadastrarNovoEspaco(List<EspacoHospedagem> espacos)
+        {
+            Console.Clear();
+            Console.WriteLine("==== CADASTRO DE NOVO ESPAÇO ====\n");
+
+            string[] opcoesTipo = { "Chalé", "Cabana", "Apartamento", "Casa", "Suíte", "Quarto", "Loft", "Outro" };
+
+            for (int i = 0; i < opcoesTipo.Length; i++)
+                Console.WriteLine($"{i + 1} - {opcoesTipo[i]}");
+
+            int escolhaTipo;
+            do
+            {
+                Console.Write("\nSelecione o tipo de espaço: ");
+            } while (!int.TryParse(Console.ReadLine(), out escolhaTipo) || escolhaTipo < 1 || escolhaTipo > opcoesTipo.Length);
+
+            string tipoEspaco = opcoesTipo[escolhaTipo - 1];
+            int numeroDoTipo = espacos.Count(e => e.TipoEspaco == tipoEspaco) + 1;
+            string nomeSugerido = $"{tipoEspaco} {numeroDoTipo}";
+
             Console.Write($"\nDeseja usar o nome sugerido \"{nomeSugerido}\"? (S/N): ");
             string usarNome = Console.ReadLine()!.Trim().ToUpper();
 
             string nomeEspaco = (usarNome == "S")
-                ? nomeSugerido
-                : EntradaHelper.LerTexto("Digite o nome personalizado do espaço");
+            ? nomeSugerido
+            : EntradaHelper.LerTexto($"Digite o nome fantasia do {tipoEspaco.ToUpper()}:");
 
             int capacidade = EntradaHelper.LerInteiro("Informe a capacidade de hóspedes");
             decimal diaria = EntradaHelper.LerDecimal("Informe o valor da diária (ex: 85.90)");
@@ -92,40 +185,28 @@ namespace Menus
 
             bool temSuite = suites > 0;
 
-            Console.Write("Deseja adicionar um nome fantasia ao espaço? (S/N): ");
-            string resposta = Console.ReadLine()!.Trim().ToUpper();
-
-            string nomeFantasia;
-
-            if (resposta == "S")
-            {
-                Console.Write("Digite o nome fantasia (Ex: Chalé Maresia): ");
-                nomeFantasia = Console.ReadLine()!;
-            }
-            else
-            {
-                nomeFantasia = $"Chalé {espacos.Count + 1:D2}";
-            }
-
             EspacoHospedagem novoEspaco = new EspacoHospedagem(
-            id: espacos.Count + 1,
-            tipoEspaco: tipoEspaco,
-            capacidade: capacidade,
-            valorDiaria: diaria,
-            quantidadeQuartos: quartos,
-            possuiSuite: temSuite,
-            descricao: descricao,
-            nomeFantasia: nomeFantasia);
-
+                id: espacos.Count + 1,
+                tipoEspaco: tipoEspaco,
+                nomeFantasia: nomeEspaco,
+                capacidade: capacidade,
+                valorDiaria: diaria,
+                quantidadeQuartos: quartos,
+                possuiSuite: temSuite,
+                descricao: descricao
+            );
 
             espacos.Add(novoEspaco);
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"\nEspaço \"{nomeEspaco}\" cadastrado com sucesso!");
+            Console.WriteLine($"\n✅ {novoEspaco.Id:D3}-  {novoEspaco.TipoEspaco.ToUpper()} {novoEspaco.NomeFantasia} cadastrada com sucesso!");
             Console.ResetColor();
+
             Console.WriteLine("Pressione qualquer tecla para voltar ao menu...");
             Console.ReadKey();
         }
+        */
+
 
         private static void ListarEspacos(List<EspacoHospedagem> espacos)
         {
