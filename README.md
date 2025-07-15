@@ -7,7 +7,7 @@ Projetado com foco em **resiliência de entrada**, **experiência do usuário no
 
 Ideal para hotéis, pousadas e centros de hospedagem.
 
-## Bootccamp <a href="https://www.dio.me/" target= "_blank" ><img src="logo_dio.jpg" width="55 px" height="40"> e <a href="https://www.wexinc.com/pt-br/" target= "_blank"><img src="logo_wex.jpg" width="55 px" height="40"></a> - End to End Engineering
+## Bootcamp <a href="https://www.dio.me/" target= "_blank" ><img src="logo_dio.jpg" width="55 px" height="40"> e <a href="https://www.wexinc.com/pt-br/" target= "_blank"><img src="logo_wex.jpg" width="55 px" height="40"></a> - End to End Engineering
 
 <img src="QA/Sistema_de_hospedagem_mapa_em_arvore.png">
 ----------------------------------------------------
