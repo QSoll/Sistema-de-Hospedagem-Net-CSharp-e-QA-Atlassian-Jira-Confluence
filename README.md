@@ -12,8 +12,6 @@ Ideal para hotéis, pousadas e centros de hospedagem.
 
 QA - Utilizando Atlassian / Jira e Confluence
 
-<a href="https://solmorcillodev.atlassian.net/wiki/x/LoIO>Projeto no Atlassian</a>
-
 1- Casos de teste BDD
 
 2- Casos de teste step-by-step
