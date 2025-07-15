@@ -1,3 +1,5 @@
+<img src="QA/resort.png">
+
 ## Sistema de Gerenciamento de Hospedagem
 
 Um sistema de terminal em C# para gerenciar espaços, hóspedes, reservas e emissão de comprovantes.  
@@ -5,55 +7,30 @@ Projetado com foco em **resiliência de entrada**, **experiência do usuário no
 
 Ideal para hotéis, pousadas e centros de hospedagem.
 
+<img src="QA/Sistema_de_hospedagem_mapa_em_arvore.png">
+----------------------------------------------------
 
-trilha-net-explorando-desafio/
-│
-├── 📁 Comprovantes/.................# Pasta onde são salvos arquivos .txt de comprovantes
-│   └── Comprovante_*.txt ...........# Arquivo gerado automaticamente com base na data
-│
-├── 📁 Contexto/ 
-│   └── SessaoAtual.cs ..............# Gerencia reservas, clientes e seleção ativa da sessão
-│
-├── 📁 Controladoras/................# Camada de lógica que orquestra os dados
-│   ├── ClienteControlador.cs........# Métodos: Cadastrar, Excluir, Listar clientes
-│   ├── EspacoControlador.cs.........# Métodos: Cadastrar, Editar, Exibir, Excluir, Listar espaços
-│   └── ReservaControladora.cs.......# Método principal: CriarReserva
-│
-├── 📁 Menus/.......................# Interface de navegação para cada módulo funcional
-│   ├── MenuPrincipal.cs ............# Ponto central de entrada – exibe módulos principais
-│   ├── MenuEspacos.cs ..............# Gerencia espaços de hospedagem
-│   ├── MenuHospedes.cs..............# Gerencia hóspedes e suas ações
-│   ├── MenuReservas.cs..............# Cria, finaliza, cancela e vincula reservas
-│   ├── MenuComprovantes.cs..........# Emite comprovantes de reserva – visual ou arquivo
-│   ├── MenuRelatorios.cs ...........# Gera relatórios: financeiro e clientes únicos
-│   └── MenuSobreSistema.cs .........# Tela institucional sobre o projeto
-│
-├── 📁 Models/.......................# Classes que representam os dados
-│   ├── Clientes.cs .................# Propriedades: Nome, Sobrenome, Email, CPF, etc.
-│   └── Reserva.cs...................# Propriedades e métodos: Check-in, cálculo, clientes vinculados
-│
-├── 📁 Servicos/
-│   └── ServicoClientes.cs ...........# Responsável por salvar dados dos clientes em arquivo
-│
-├── 📁 Utils/ ........................# Funções auxiliares reutilizáveis e visuais
-│   ├── CentralDeNavegacao.cs.........# Navegação segura, encerramento e reinício
-│   ├── MiniMenuHelper.cs.............# Rodapé interativo com atalhos
-│   ├── CentralEntrada.cs.............# Entrada validada e contextual
-│   ├── CentralEntradaInteira.cs......# Entrada de inteiros com limite e datas
-│   ├── CentralEntradaControladora.cs.# Entrada de email, texto, números com escape
-│   ├── CentralSaida.cs...............# Saída estilizada com cores e bordas
-│   ├── EntradaHelper.cs..............# Confirmações, retorno visual
-│   ├── InterfaceHelper.cs............# Animações e escrita com estilo
-│   └── MiniMenu.cs...................# Componente de rodapé interativo
-│
-├── DesafioProjetoHospedagem.csproj ..# Arquivo do projeto .NET
-├── Program.cs........................# Método Main com menu principal
-├── README.md ........................# Documentação do projeto
-└── trilha-net-explorando-desafio.sl..# Solução Visual Studio
+QA - Utilizando Atlassian / Jira e Confluence
+
+1- Casos de teste BDD
+
+2- Casos de teste step-by-step
+
+3- MindMap
+
+4- Plano de fluxo de bug
+
+5- Relatórios Atlassian
+
+6- User stories
+
+----------------------------------------------------
+
+Características do sistema
 
 ## Entrada Segura (`EntradaHelper.cs`)
 
-- Cancelamento com Enter repetido
+- Ação de direcionamento do usuário após pressionar 3x Enter
 - Validações inteligentes de texto, números e e-mails
 - Confirmação Sim/Não padronizada
 - Nome sugerido com override
@@ -100,7 +77,7 @@ trilha-net-explorando-desafio/
 ### Listagem
 - Espaços com status de ocupação
 - Reservas por status
-- Hóspedes por nome parcial
+- Clientes cadastrados, clientes hospedados (hóspedes), clientes não hospedados
 
 ### Cancelamento e Exclusões
 - Exclusões protegidas por confirmação
@@ -129,7 +106,7 @@ Todas as operações possuem validação, confirmação ou retorno visual.
 
 ## Conclusão
 
-Sistema pronto para produção:
+Sistema em fase de testes e correções, quase pronto para produção:
 
 - ✅ Modular e organizado
 - ✅ Interface amigável
@@ -139,8 +116,8 @@ Sistema pronto para produção:
 
 ---
 
-> Desenvolvido por <a href="https://solmorcillo.com.br" title="Website Sol Morcillo" target="_blank"><img src="logo_SM.jpg" width="40" height="50"></a> 💛 com atenção aos detalhes
-  Pensando na experiência do usuário.
+> Desenvolvido por <a href="https://solmorcillo.com.br/imgs_public/logo_SM.jpg" title="Website Sol Morcillo" target="_blank"><img src="https://solmorcillo.com.br/imgs_public/logo_SM.jpg" width="40" height="50"></a> com atenção aos detalhes
+  💛 Pensando na experiência do usuário.
 
 ## ▶️ Como executar
 
@@ -154,6 +131,6 @@ Sistema pronto para produção:
 
 4. Navegue pelo menu principal e explore os módulos
 
-<a href="https://solmorcillo.com.br" title="Website Sol Morcillo" target="_blank"><img src="logo_SM.jpg" width="60" height="70"></a>
+<a href="https://solmorcillo.com.br/imgs_public/logo_SM.jpg" title="Website Sol Morcillo" target="_blank"><img src="https://solmorcillo.com.br/imgs_public/logo_SM.jpg" width="60" height="70"></a>
 
 
