@@ -5,51 +5,7 @@ Projetado com foco em **resiliência de entrada**, **experiência do usuário no
 
 Ideal para hotéis, pousadas e centros de hospedagem.
 
-
-trilha-net-explorando-desafio/
-│
-├── 📁 Comprovantes/.................# Pasta onde são salvos arquivos .txt de comprovantes
-│   └── Comprovante_*.txt ...........# Arquivo gerado automaticamente com base na data
-│
-├── 📁 Contexto/ 
-│   └── SessaoAtual.cs ..............# Gerencia reservas, clientes e seleção ativa da sessão
-│
-├── 📁 Controladoras/................# Camada de lógica que orquestra os dados
-│   ├── ClienteControlador.cs........# Métodos: Cadastrar, Excluir, Listar clientes
-│   ├── EspacoControlador.cs.........# Métodos: Cadastrar, Editar, Exibir, Excluir, Listar espaços
-│   └── ReservaControladora.cs.......# Método principal: CriarReserva
-│
-├── 📁 Menus/.......................# Interface de navegação para cada módulo funcional
-│   ├── MenuPrincipal.cs ............# Ponto central de entrada – exibe módulos principais
-│   ├── MenuEspacos.cs ..............# Gerencia espaços de hospedagem
-│   ├── MenuHospedes.cs..............# Gerencia hóspedes e suas ações
-│   ├── MenuReservas.cs..............# Cria, finaliza, cancela e vincula reservas
-│   ├── MenuComprovantes.cs..........# Emite comprovantes de reserva – visual ou arquivo
-│   ├── MenuRelatorios.cs ...........# Gera relatórios: financeiro e clientes únicos
-│   └── MenuSobreSistema.cs .........# Tela institucional sobre o projeto
-│
-├── 📁 Models/.......................# Classes que representam os dados
-│   ├── Clientes.cs .................# Propriedades: Nome, Sobrenome, Email, CPF, etc.
-│   └── Reserva.cs...................# Propriedades e métodos: Check-in, cálculo, clientes vinculados
-│
-├── 📁 Servicos/
-│   └── ServicoClientes.cs ...........# Responsável por salvar dados dos clientes em arquivo
-│
-├── 📁 Utils/ ........................# Funções auxiliares reutilizáveis e visuais
-│   ├── CentralDeNavegacao.cs.........# Navegação segura, encerramento e reinício
-│   ├── MiniMenuHelper.cs.............# Rodapé interativo com atalhos
-│   ├── CentralEntrada.cs.............# Entrada validada e contextual
-│   ├── CentralEntradaInteira.cs......# Entrada de inteiros com limite e datas
-│   ├── CentralEntradaControladora.cs.# Entrada de email, texto, números com escape
-│   ├── CentralSaida.cs...............# Saída estilizada com cores e bordas
-│   ├── EntradaHelper.cs..............# Confirmações, retorno visual
-│   ├── InterfaceHelper.cs............# Animações e escrita com estilo
-│   └── MiniMenu.cs...................# Componente de rodapé interativo
-│
-├── DesafioProjetoHospedagem.csproj ..# Arquivo do projeto .NET
-├── Program.cs........................# Método Main com menu principal
-├── README.md ........................# Documentação do projeto
-└── trilha-net-explorando-desafio.sl..# Solução Visual Studio
+<img src="Sistema_de_hospedagem_mapa_em_arvore.png">
 
 ## Entrada Segura (`EntradaHelper.cs`)
 
@@ -139,8 +95,8 @@ Sistema pronto para produção:
 
 ---
 
-> Desenvolvido por <a href="https://solmorcillo.com.br" title="Website Sol Morcillo" target="_blank"><img src="logo_SM.jpg" width="40" height="50"></a> 💛 com atenção aos detalhes
-  Pensando na experiência do usuário.
+> Desenvolvido por <a href="https://solmorcillo.com.br/imgs_public/logo_SM.jpg" title="Website Sol Morcillo" target="_blank"><img src="https://solmorcillo.com.br/imgs_public/logo_SM.jpg" width="40" height="50"></a> com atenção aos detalhes
+  💛 Pensando na experiência do usuário.
 
 ## ▶️ Como executar
 
@@ -154,6 +110,6 @@ Sistema pronto para produção:
 
 4. Navegue pelo menu principal e explore os módulos
 
-<a href="https://solmorcillo.com.br" title="Website Sol Morcillo" target="_blank"><img src="logo_SM.jpg" width="60" height="70"></a>
+<a href="https://solmorcillo.com.br/imgs_public/logo_SM.jpg" title="Website Sol Morcillo" target="_blank"><img src="https://solmorcillo.com.br/imgs_public/logo_SM.jpg" width="60" height="70"></a>
 
 
