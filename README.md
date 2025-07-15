@@ -5,7 +5,7 @@ Projetado com foco em **resiliência de entrada**, **experiência do usuário no
 
 Ideal para hotéis, pousadas e centros de hospedagem.
 
-<img src="Sistema_de_hospedagem_mapa_em_arvore.png">
+<img src="QA/Sistema_de_hospedagem_mapa_em_arvore.png">
 
 ## Entrada Segura (`EntradaHelper.cs`)
 
