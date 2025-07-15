@@ -1,68 +1,95 @@
 using System;
 using System.Collections.Generic;
 using DesafioProjetoHospedagem.Models;
+using DesafioProjetoHospedagem.Utils;
+using DesafioProjetoHospedagem.Controladoras;
+using DesafioProjetoHospedagem.Servicos;
+using DesafioProjetoHospedagem.Sessao;
+using DesafioProjetoHospedagem.Menus;
 
-namespace Menus
+
+namespace DesafioProjetoHospedagem.Menus
 {
     public static class MenuPrincipal
     {
-        public static void Exibir(
-            List<EspacoHospedagem> espacos,
-            List<Hospede> hospedes,
-            List<Reserva> reservas,
-            List<Hospede> hospedesDaReserva,
-            Reserva? reservaSelecionada)
+        public static void ExibirPrincipal()
         {
-            int opcao;
-
-            do
+            while (true)
             {
                 Console.Clear();
-                Console.WriteLine("============================================");
-                Console.WriteLine("\n   BEM-VINDO(A) AO SISTEMA DE HOSPEDAGEM");
-                Console.WriteLine($"   Data: {DateTime.Now:dd/MM/yyyy} | Hora: {DateTime.Now:HH:mm:ss}");
-                Console.WriteLine("============================================");
-                Console.WriteLine("\n               MENU PRINCIPAL\n");
-                Console.WriteLine("1 - Gerenciar Espaços");
-                Console.WriteLine("2 - Gerenciar Hóspedes");
-                Console.WriteLine("3 - Gerenciar Reservas");
-                Console.WriteLine("4 - Relatórios e Estatísticas");
-                Console.WriteLine("5 - Sobre o Sistema");
-                Console.WriteLine("0 - Sair");
-                Console.Write("\nEscolha uma opção: ");
+                CentralSaida.CabecalhoMenus("MENU PRINCIPAL");
+                Console.WriteLine("A partir de 10 dias de hospedagem, 10 % de descoonto.");
+                Console.WriteLine("Tempo de hospedagem ultrapassado, acrescentar taxa de R$ 5,00 por hora.");
+                SessaoAtual.VerificarSessaoGlobal();
 
-                if (!int.TryParse(Console.ReadLine(), out opcao))
-                    opcao = -1;
+                //Console.WriteLine(); // Espaçamento visual
 
-                switch (opcao)
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("1 - Espaços");
+                Console.WriteLine("2 - Reservas");
+                Console.WriteLine("3 - Clientes");
+                Console.WriteLine("4 - Comprovantes de Reserva");
+                Console.WriteLine("5 - Relatórios e Estatísticas");
+                Console.WriteLine("6 - Sobre o Sistema");
+                Console.WriteLine("0 - Encerrar");
+                Console.ResetColor();
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("Escolha uma opção: ");
+                Console.ResetColor();
+
+                string? entrada = Console.ReadLine()?.Trim();
+                Console.WriteLine();
+
+                switch (entrada)
                 {
-                    case 1:
-                        MenuEspacos.Exibir(espacos, reservas);
+                    case "1":
+                        NavegacaoAtual.Registrar(() => ExibirPrincipal());
+                        MenuEspacos.ExibirMenuEspacos();
                         break;
-                    case 2:
-                        MenuHospedes.Exibir(hospedes, reservas);
+
+                    case "2":
+                        NavegacaoAtual.Registrar(() => ExibirPrincipal());
+                        MenuReservas.ExibirMenuReservas();
                         break;
-                    case 3:
-                        MenuReservas.Exibir(reservas, hospedes, espacos);
+
+                    case "3":
+                        NavegacaoAtual.Registrar(() => ExibirPrincipal());
+                        Reserva? resultadoReserva = MenuClientes.ExibirMenuClientes();
+                        if (resultadoReserva != null)
+                            SessaoAtual.ReservaSelecionada = resultadoReserva;
                         break;
-                    case 4:
-                        MenuRelatorios.Exibir(espacos, reservas, hospedes);
+
+                    case "4":
+                        NavegacaoAtual.Registrar(() => ExibirPrincipal());
+                        MenuComprovantes.ExibirMenuComprovantes();
                         break;
-                    case 5:
-                        MostrarSobreSistemas.Exibir();
+
+                    case "5":
+                        NavegacaoAtual.Registrar(() => ExibirPrincipal());
+                        MenuRelatorios.Exibir();
                         break;
-                    case 0:
-                        Console.WriteLine("\nSaindo do sistema...");
+
+                    case "6":
+                        NavegacaoAtual.Registrar(() => ExibirPrincipal());
+                        MostrarSobreSistema.ExibirSobreSistema();
                         break;
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("\nOpção inválida. Tente novamente.");
+
+                    case "0":
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("\nSistema encerrado. Até logo !!!");
                         Console.ResetColor();
-                        Console.ReadKey();
+                        Environment.Exit(0);
+                        return;
+
+                    default:
+                        CentralSaida.Exibir(TipoMensagem.Erro, "Ops... Errou. Tente novamente com uma opção válida.");
                         break;
                 }
-
-            } while (opcao != 0);
+            }
         }
     }
 }
+

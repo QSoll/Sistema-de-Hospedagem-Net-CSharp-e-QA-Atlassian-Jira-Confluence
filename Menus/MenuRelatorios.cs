@@ -2,44 +2,58 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using DesafioProjetoHospedagem.Models;
+using DesafioProjetoHospedagem.Utils;
+using DesafioProjetoHospedagem.Controladoras;
+using DesafioProjetoHospedagem.Sessao;
+using DesafioProjetoHospedagem.Menus;
 
-
-namespace Menus
+namespace DesafioProjetoHospedagem.Menus
 {
     public static class MenuRelatorios
-    {
-        public static void Exibir(List<EspacoHospedagem> espacos, List<Reserva> reservas, List<Hospede> hospedes)
+    {        public static void Exibir()
         {
             Console.Clear();
-            Console.WriteLine("========================================");
-            Console.WriteLine("\n    RELATÓRIO GERAL | HOTEL FICTÍCIO");
-            Console.WriteLine($"    Data: {DateTime.Now:dd/MM/yyyy}     | Hora: {DateTime.Now:HH:mm:ss}");
-            Console.WriteLine("========================================\n");
+            CentralSaida.CabecalhoMenus("Relatórios e Estatísticas");
 
-            int totalSuites = espacos.Count;
-            int suitesOcupadas = reservas.Count(r => r.Ativa);
-            int suitesDisponiveis = totalSuites - suitesOcupadas;
+            int totalEspacos = SessaoAtual.Espacos.Count;
+            int espacosOcupados = SessaoAtual.Reservas.Count(r => r.Ativa);
+            int espacosDisponiveis = totalEspacos - espacosOcupados;
 
-            int totalReservas = reservas.Count;
-            int reservasAtivas = reservas.Count(r => r.Ativa);
-            int reservasEncerradas = reservas.Count(r => !r.Ativa);
+            int totalReservas = SessaoAtual.Reservas.Count;
+            int reservasAtivas = SessaoAtual.Reservas.Count(r => r.Ativa);
+            int reservasEncerradas = SessaoAtual.Reservas.Count(r => !r.Ativa);
 
-            int totalHospedes = hospedes.DistinctBy(h => h.NomeCompleto).Count();
+            int totalClientesUnicos = SessaoAtual.Clientes.DistinctBy(c => c.NomeCompleto).Count();
 
-            decimal totalEstimado = reservas.Sum(r => r.CalcularValorDiaria());
+            decimal totalEstimado = SessaoAtual.Reservas
+            .Where(r => r.Ativa)
+            .Sum(r => r.CalcularResumoFinanceiro().ValorTotalEstimado);
 
-            Console.WriteLine($"Suítes cadastradas: {totalSuites}");
-            Console.WriteLine($"Suítes disponíveis: {suitesDisponiveis}");
-            Console.WriteLine($"Suítes ocupadas: {suitesOcupadas}");
-            Console.WriteLine("----------------------------------------");
-            Console.WriteLine($"Total de reservas: {totalReservas}");
-            Console.WriteLine($"Ativas: {reservasAtivas}    |  📁 Encerradas: {reservasEncerradas}");
-            Console.WriteLine("----------------------------------------");
-            Console.WriteLine($"Total de hóspedes únicos: {totalHospedes}");
-            Console.WriteLine($"Valor estimado total das reservas: R$ {totalEstimado:F2}");
 
-            Console.WriteLine("\nPressione qualquer tecla para retornar ao menu...");
-            Console.ReadKey();
+            // ESPAÇOS
+            CentralSaida.Subtitulo("Espaços");
+            Console.WriteLine($"Cadastrados: {totalEspacos}");
+            CentralSaida.Exibir(TipoMensagem.Sucesso, $"Disponíveis: {espacosDisponiveis}");
+            CentralSaida.Exibir(TipoMensagem.Erro, $"Ocupados: {espacosOcupados}");
+
+            // RESERVAS
+            CentralSaida.Subtitulo("Reservas");
+            Console.WriteLine($"Total: {totalReservas}");
+            CentralSaida.Exibir(TipoMensagem.Sucesso, $"Ativas: {reservasAtivas}");
+            CentralSaida.Exibir(TipoMensagem.Alerta, $"Encerradas: {reservasEncerradas}");
+
+            // CLIENTES & FINANCEIRO
+            CentralSaida.Subtitulo("Clientes & Financeiro");
+            Console.WriteLine($"Clientes únicos: {totalClientesUnicos}");
+            CentralSaida.ExibirDestaque("valor importante");
+
+
+            MenuRodape.ExibirRodape(
+            "Menu – Relatórios",
+            aoVoltarParaSubmenu: () => MenuReservas.ExibirMenuReservas(),
+            aoVoltarMenuPrincipal: () => MenuPrincipal.ExibirPrincipal()
+            );
+
         }
     }
 }

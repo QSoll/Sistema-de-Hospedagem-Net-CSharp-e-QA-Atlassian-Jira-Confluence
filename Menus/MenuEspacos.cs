@@ -1,347 +1,357 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using DesafioProjetoHospedagem.Models;
 using DesafioProjetoHospedagem.Utils;
+using DesafioProjetoHospedagem.Controladoras;
+using DesafioProjetoHospedagem.Sessao;
+using DesafioProjetoHospedagem.Menus;
 
-namespace Menus
+namespace DesafioProjetoHospedagem.Menus
 {
     public static class MenuEspacos
     {
-        public static void Exibir(List<EspacoHospedagem> espacos, List<Reserva> reservas)
+        public static Reserva? ExibirMenuEspacos()
         {
-            int opcao;
-
-            do
+            //menu principal está aqui
+            while (true)
             {
                 Console.Clear();
-                Console.WriteLine("========================================");
-                Console.WriteLine("\n    SISTEMA DE HOSPEDAGEM | HOTEL FICTÍCIO");
-                Console.WriteLine($"    Data: {DateTime.Now:dd/MM/yyyy}     | Hora: {DateTime.Now:HH:mm:ss}");
-                Console.WriteLine("========================================");
-                Console.WriteLine("\n------------ MENU - ESPAÇOS ------------\n");
-                Console.WriteLine("1 - Cadastrar novo espaço");
-                Console.WriteLine("2 - Listar espaços cadastrados");
-                Console.WriteLine("3 - Excluir espaço");
-                Console.WriteLine("4 - Ver status dos espaços (ocupado/disponível)");
-                Console.WriteLine("0 - Voltar");
-                Console.Write("\nEscolha uma opção: ");
+                CentralSaida.CabecalhoMenus("Menu de Espaços");
 
-                if (!int.TryParse(Console.ReadLine(), out opcao))
-                    opcao = -1;
+                Console.WriteLine("A partir de 10 dias: 10 % de desconto.");
+                Console.WriteLine("Ultrapassado o tempo da diária será cobrado uma taxa de R$ 5,00 por hora.");
+                Console.WriteLine("");
+                Console.WriteLine("1- Cadastrar");
+                Console.WriteLine("2- Listar");
+                Console.WriteLine("3- Editar");
+                Console.WriteLine("4- Excluir");
+
+                CentralSaida.LinhaSeparadora('─');
+
+                int? opcao = CentralEntradaControladora.LerInteiroMinMaxComSN(
+                "Escolha: 8.Voltar   9.Menu principal   0.Encerrar",
+                1,
+                4,
+                "Menu – Espaços",
+                () => MenuEspacos.ExibirMenuEspacos(),
+
+                () => MenuPrincipal.ExibirPrincipal()
+                );
+
+                Console.WriteLine();
 
                 switch (opcao)
                 {
-                    case 1:
-                        CadastrarNovoEspaco(espacos);
+                    case 1: //cadastrando
+                        NavegacaoAtual.Registrar(() => MenuEspacos.ExibirMenuEspacos());
+                        EspacoControlador.CadastrarEspaco();
                         break;
-                    case 2:
-                        ListarEspacos(espacos);
+
+                    case 2: //indo para STATUS DO ESPACO
+                        NavegacaoAtual.Registrar(() => MenuEspacos.ExibirMenuEspacos());
+                        MenuEspacos.ListarEspacosGlobal("Padrao");
                         break;
+
                     case 3:
-                        ExcluirEspaco(espacos, reservas);
+                        NavegacaoAtual.Registrar(() => MenuEspacos.ExibirMenuEspacos());
+                        EspacoControlador.EditarCadastroEspaco();
                         break;
+
                     case 4:
-                        ListarEspacosComStatus(espacos, reservas);
+                        NavegacaoAtual.Registrar(() => MenuEspacos.ExibirMenuEspacos());
+                        EspacoControlador.ExcluirCadastroEspaco();
                         break;
+
+                    case 8:
+                        return SessaoAtual.ReservaSelecionada;
+
+                    case 9:
+                        MenuPrincipal.ExibirPrincipal();
+                        return SessaoAtual.ReservaSelecionada;
+
                     case 0:
+                        CentralSaida.ExibirDespedidaSimples();
+                        Environment.Exit(0);
                         break;
+
                     default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("\nOpção inválida. Pressione qualquer tecla para tentar novamente...");
-                        Console.ResetColor();
-                        Console.ReadKey();
+                        CentralSaida.Exibir(TipoMensagem.Erro, "Ops. Opção inválida.");
                         break;
                 }
 
-            } while (opcao != 0);
+                MenuRodape.ExibirRodape(
+                "Menu – Espaços",
+                () => MenuEspacos.ExibirMenuEspacos(),
+                () => MenuPrincipal.ExibirPrincipal()
+                );
+
+            }
         }
 
-        private static void CadastrarNovoEspaco(List<EspacoHospedagem> espacos)
+        public static void ListarEspacosGlobal(string origemChamada = "Padrao")
         {
             Console.Clear();
-            Console.WriteLine("==== CADASTRO DE NOVO ESPAÇO ====\n");
 
-            string[] opcoesTipo = { "Chalé", "Cabana", "Apartamento", "Casa", "Suíte", "Quarto", "Loft", "Outro" };
+            CentralSaida.CabecalhoMenus("Catálogo de Espaços");
 
-            for (int i = 0; i < opcoesTipo.Length; i++)
-                Console.WriteLine($"{i + 1} - {opcoesTipo[i]}");
-
-            int escolhaTipo;
-            do
+            if (!SessaoAtual.Espacos.Any())
             {
-                Console.Write("\nSelecione o tipo de espaço: ");
-            } while (!int.TryParse(Console.ReadLine(), out escolhaTipo) || escolhaTipo < 1 || escolhaTipo > opcoesTipo.Length);
+                CentralSaida.Exibir(TipoMensagem.Alerta, "Nenhum espaço disponível.");
 
-            string tipoEspaco = opcoesTipo[escolhaTipo - 1];
-            int numeroDoTipo = espacos.Count(e => e.TipoEspaco == tipoEspaco) + 1;
-            string nomeSugerido = $"{tipoEspaco} {numeroDoTipo}";
-
-            string usarNome;
-            int tentativasVazias = 0;
-            do
-            {
-                Console.Write($"\nDeseja usar o nome sugerido \"{nomeSugerido}\"? (S/N): ");
-                usarNome = Console.ReadLine()!.Trim().ToUpper();
-
-                if (string.IsNullOrEmpty(usarNome))
+                bool desejaCadastrar = CentralEntradaControladora.SimNao("Deseja cadastrar agora?");
+                if (desejaCadastrar)
                 {
-                    tentativasVazias++;
-                    if (tentativasVazias >= 3)
-                    {
-                        Console.Write("Você pressionou Enter várias vezes. Deseja cancelar e voltar ao menu? (S/N): ");
-                        string voltar = Console.ReadLine()!.Trim().ToUpper();
-                        if (voltar == "S")
-                        {
-                            Console.WriteLine("\nRetornando ao menu...");
-                            return;
-                        }
-                        else
-                        {
-                            tentativasVazias = 0;
-                        }
-                    }
-                }
-            } while (usarNome != "S" && usarNome != "N");
-
-            string? nomeEspaco = (usarNome == "S")
-                ? nomeSugerido
-                : EntradaHelper.LerTextoComCancelamento($"Digite o nome fantasia do {tipoEspaco.ToUpper()}");
-
-            if (nomeEspaco == null) return;
-
-            int? capacidade = EntradaHelper.LerInteiroComCancelamento("Informe a capacidade de hóspedes");
-            if (capacidade == null) return;
-
-            decimal? diaria = EntradaHelper.LerDecimalComCancelamento("Informe o valor da diária (ex: 85.90)");
-            if (diaria == null) return;
-
-            int? quartos = EntradaHelper.LerInteiroComCancelamento("Quantidade de quartos");
-            if (quartos == null) return;
-
-            int? suites = EntradaHelper.LerInteiroComCancelamento("Quantos desses quartos possuem suíte?");
-            if (suites == null) return;
-
-            string? descricao = EntradaHelper.LerTextoComCancelamento("Digite uma breve descrição para este espaço");
-            if (descricao == null) return;
-
-            bool temSuite = suites > 0;
-
-            EspacoHospedagem novoEspaco = new EspacoHospedagem(
-                id: espacos.Count + 1,
-                tipoEspaco: tipoEspaco,
-                nomeFantasia: nomeEspaco,
-                capacidade: capacidade.Value,
-                valorDiaria: diaria.Value,
-                quantidadeQuartos: quartos.Value,
-                possuiSuite: temSuite,
-                descricao: descricao
-            );
-
-            espacos.Add(novoEspaco);
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"\n{novoEspaco.Id:D3}-  {novoEspaco.TipoEspaco.ToUpper()} {novoEspaco.NomeFantasia} . Cadastro realizado com sucesso!");
-            Console.ResetColor();
-
-            Console.WriteLine("Pressione qualquer tecla para voltar ao menu...");
-            Console.ReadKey();
-        }
-
-
-        /*
-        private static void CadastrarNovoEspaco(List<EspacoHospedagem> espacos)
-        {
-            Console.Clear();
-            Console.WriteLine("==== CADASTRO DE NOVO ESPAÇO ====\n");
-
-            string[] opcoesTipo = { "Chalé", "Cabana", "Apartamento", "Casa", "Suíte", "Quarto", "Loft", "Outro" };
-
-            for (int i = 0; i < opcoesTipo.Length; i++)
-                Console.WriteLine($"{i + 1} - {opcoesTipo[i]}");
-
-            int escolhaTipo;
-            do
-            {
-                Console.Write("\nSelecione o tipo de espaço: ");
-            } while (!int.TryParse(Console.ReadLine(), out escolhaTipo) || escolhaTipo < 1 || escolhaTipo > opcoesTipo.Length);
-
-            string tipoEspaco = opcoesTipo[escolhaTipo - 1];
-            int numeroDoTipo = espacos.Count(e => e.TipoEspaco == tipoEspaco) + 1;
-            string nomeSugerido = $"{tipoEspaco} {numeroDoTipo}";
-
-            Console.Write($"\nDeseja usar o nome sugerido \"{nomeSugerido}\"? (S/N): ");
-            string usarNome = Console.ReadLine()!.Trim().ToUpper();
-
-            string nomeEspaco = (usarNome == "S")
-            ? nomeSugerido
-            : EntradaHelper.LerTexto($"Digite o nome fantasia do {tipoEspaco.ToUpper()}:");
-
-            int capacidade = EntradaHelper.LerInteiro("Informe a capacidade de hóspedes");
-            decimal diaria = EntradaHelper.LerDecimal("Informe o valor da diária (ex: 85.90)");
-            int quartos = EntradaHelper.LerInteiro("Quantidade de quartos");
-            int suites = EntradaHelper.LerInteiro("Quantos desses quartos possuem suíte?");
-            string descricao = EntradaHelper.LerTexto("Digite uma breve descrição para este espaço");
-
-            bool temSuite = suites > 0;
-
-            EspacoHospedagem novoEspaco = new EspacoHospedagem(
-                id: espacos.Count + 1,
-                tipoEspaco: tipoEspaco,
-                nomeFantasia: nomeEspaco,
-                capacidade: capacidade,
-                valorDiaria: diaria,
-                quantidadeQuartos: quartos,
-                possuiSuite: temSuite,
-                descricao: descricao
-            );
-
-            espacos.Add(novoEspaco);
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"\n✅ {novoEspaco.Id:D3}-  {novoEspaco.TipoEspaco.ToUpper()} {novoEspaco.NomeFantasia} cadastrada com sucesso!");
-            Console.ResetColor();
-
-            Console.WriteLine("Pressione qualquer tecla para voltar ao menu...");
-            Console.ReadKey();
-        }
-        */
-
-
-        private static void ListarEspacos(List<EspacoHospedagem> espacos)
-        {
-            Console.Clear();
-            Console.WriteLine("==== LISTA DE ESPAÇOS ====\n");
-
-            if (!espacos.Any())
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Ainda não há espaços cadastrados.");
-                Console.ResetColor();
-            }
-            else
-            {
-                foreach (var espaco in espacos
-                    .OrderBy(e => e.TipoEspaco)
-                    .ThenBy(e => e.Id))
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"[{espaco.Id:00}] {espaco.TipoEspaco.ToUpper()} - {espaco.NomeFantasia}");
-                    Console.ResetColor();
-                    Console.WriteLine($"Capacidade: até {espaco.Capacidade} pessoas");
-                    Console.WriteLine($"Diária: {espaco.ValorDiaria:C}\n");
-                }
-            }
-
-            Console.WriteLine("Pressione qualquer tecla para voltar...");
-            Console.ReadKey();
-        }
-        private static void ListarEspacosComStatus(List<EspacoHospedagem> espacos, List<Reserva> reservas)
-        {
-            Console.Clear();
-            Console.WriteLine("=== STATUS DOS ESPAÇOS ===\n");
-
-            if (!espacos.Any())
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Nenhum espaço cadastrado no sistema.");
-                Console.ResetColor();
-            }
-            else
-            {
-                foreach (var espaco in espacos.OrderBy(e => e.TipoEspaco).ThenBy(e => e.Id))
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"{espaco.TipoEspaco.ToUpper()} - {espaco.NomeFantasia} (ID {espaco.Id:00})");
-
-                    Console.ResetColor();
-
-                    var reserva = reservas.FirstOrDefault(r => r.Ativa && r.Espaco.Id == espaco.Id);
-                    if (reserva == null)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Situação: Disponível para reserva\n");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Situação: Ocupado 🔒");
-                        Console.ResetColor();
-                        Console.WriteLine($" - Check-in: {reserva.DataCheckIn:dd/MM/yyyy}");
-                        Console.WriteLine($" - Dias reservados: {reserva.DiasReservados}");
-                        Console.WriteLine($" - Hóspedes:");
-                        foreach (var h in reserva.Hospedes)
-                            Console.WriteLine($"    • {h.NomeCompleto}");
-                        Console.WriteLine();
-                    }
-                }
-            }
-
-            Console.WriteLine("\nPressione qualquer tecla para voltar ao menu...");
-            Console.ReadKey();
-        }
-
-        private static void ExcluirEspaco(List<EspacoHospedagem> espacos, List<Reserva> reservas)
-        {
-            Console.Clear();
-            Console.WriteLine("=== EXCLUSÃO DE ESPAÇO ===\n");
-
-            if (!espacos.Any())
-            {
-                Console.WriteLine("Nenhum espaço cadastrado.");
-                Console.ReadKey();
-                return;
-            }
-
-            foreach (var e in espacos.OrderBy(e => e.TipoEspaco).ThenBy(e => e.Id))
-            {
-                Console.WriteLine($"[ID {e.Id}] {e.TipoEspaco} - {e.NomeFantasia} | Capacidade: {e.Capacidade} | Diária: {e.ValorDiaria:C}");
-            }
-
-            Console.Write("\nDigite o ID do espaço que deseja excluir: ");
-            if (!int.TryParse(Console.ReadLine(), out int idSelecionado))
-            {
-                Console.WriteLine("Entrada inválida.");
-                Console.ReadKey();
-                return;
-            }
-
-            var espacoSelecionado = espacos.FirstOrDefault(e => e.Id == idSelecionado);
-            if (espacoSelecionado == null)
-            {
-                Console.WriteLine("Espaço não encontrado.");
-                Console.ReadKey();
-                return;
-            }
-
-            bool ocupado = reservas.Any(r => r.Ativa && r.Espaco.Id == espacoSelecionado.Id);
-            if (ocupado)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("\nEste espaço está com uma reserva ativa e não pode ser excluído.");
-                Console.ResetColor();
-            }
-            else
-            {
-                Console.Write($"\nTem certeza que deseja excluir o espaço \"{espacoSelecionado.NomeFantasia}\"? (S/N): ");
-                string? resposta = Console.ReadLine()?.Trim().ToUpper();
-
-                if (resposta == "S")
-                {
-                    espacos.Remove(espacoSelecionado);
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("\nEspaço excluído com sucesso!");
-                    Console.ResetColor();
+                    EspacoControlador.CadastrarEspaco();
+                    ListarEspacosGlobal(); // volta à tela atual
                 }
                 else
                 {
-                    Console.WriteLine("\nOperação cancelada. Nenhuma alteração foi feita.");
+                    MenuRodapeGlobal.ExibirRodapeGlobal("Catálogo de Espaços");
+                }
+                return;
+            }
+
+            var espacosAgrupados = SessaoAtual.Espacos
+
+                .GroupBy(e => e.TipoEspaco.Trim().ToUpper())
+                //GroupBy(e => e.TipoEspaco.ToUpper())
+                .OrderBy(g => g.Key);
+
+            foreach (var grupo in espacosAgrupados)
+            {
+                string tipoEspaco = grupo.Key;
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(new string('─', Console.WindowWidth));
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(tipoEspaco.PadLeft((Console.WindowWidth + tipoEspaco.Length) / 2));
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(new string('─', Console.WindowWidth));
+                Console.ResetColor();
+                Console.WriteLine();
+
+                int contadorVisual = 1;
+
+                foreach (var espaco in grupo)
+                {
+                    string idVisual = $"{espaco.TipoAbreviado} {contadorVisual:D3}";
+                    contadorVisual++;
+
+                    Console.WriteLine();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(idVisual);
+                    Console.ResetColor();
+                    Console.WriteLine($" - {espaco.NomeFantasia}");
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Capacidade: ");
+                    Console.ResetColor();
+                    Console.WriteLine($"{espaco.Capacidade} pessoa{(espaco.Capacidade > 1 ? "s" : "")}");
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Diária: ");
+                    Console.ResetColor();
+                    Console.WriteLine($"R$ {espaco.ValorDiaria:N2}");
+
+                    Console.Write($"{espaco.QuantidadeQuartos} quarto{(espaco.QuantidadeQuartos > 1 ? "s" : "")}, sendo ");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write($"{espaco.QuantidadeSuites}");
+                    Console.ResetColor();
+                    Console.WriteLine($" suíte{(espaco.QuantidadeSuites > 1 ? "s" : "")}.");
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Descrição: ");
+                    Console.ResetColor();
+                    Console.WriteLine(string.IsNullOrWhiteSpace(espaco.Descricao) ? "Não informada." : espaco.Descricao);
+
+                    Console.WriteLine();
+                    Console.WriteLine("DETALHES");
+                    Console.WriteLine();
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Status: ");
+                    Console.ResetColor();
+                    Console.WriteLine(string.IsNullOrWhiteSpace(espaco.Status) ? "Indefinido" : espaco.Status);
+
+                    var reserva = SessaoAtual.Reservas.FirstOrDefault(r => r.Ativa && r.Espaco?.Id == espaco.Id);
+
+                    if (reserva != null)
+                    {
+                        var resumo = reserva.CalcularResumoFinanceiro();
+                        ReservaControladora.VisualizadorFinanceiro.ExibirResumoFinanceiro(resumo);
+
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("Hóspedes:");
+                        Console.ResetColor();
+
+                        if (reserva.Clientes.Any())
+                        {
+                            int i = 1;
+                            foreach (var cliente in reserva.Clientes)
+                                Console.WriteLine($"{i++}- {cliente.Nome}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ainda não cadastrados");
+                        }
+                    }
+                }
+
+                Console.WriteLine();
+            }
+
+            Console.WriteLine();
+
+            bool desejaEscolher = CentralEntradaControladora.SimNao("Deseja selecionar um espaço para continuar alguma ação?");
+            if (desejaEscolher)
+            {
+                EspacoHospedagem espacoSelecionado = EspacoControlador.BuscarEspacoPorFiltro();
+
+                if (espacoSelecionado != null)
+                {
+                    Reserva novaReserva = new Reserva(new List<Cliente>(), espacoSelecionado, 1);
+
+                    if (origemChamada != "Padrao")
+                    {
+                        CentralSaida.Exibir(TipoMensagem.Sucesso, $"Espaço vinculado à ação existente.");
+
+                        switch (origemChamada)
+                        {
+                            case "CriarReserva": CriarReservaControladora.ContinuarCriacao(novaReserva); break;
+                            case "EditarReserva": EditarReservaControladora.ContinuarEdicao(novaReserva); break;
+                            case "ExcluirReserva": MenuReservas.ExcluirCadastroReserva(); break;
+                            case "CancelarReserva": MenuReservas.CancelarReserva(); break;
+                            case "ListarCadastroReservas": MenuReservas.ExibirMenuReservas(); break;
+                            default:
+                                CriarReservaControladora.IniciarComEspacoVinculado(espacoSelecionado);
+
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        CentralSaida.Exibir(TipoMensagem.Informacao, $"Espaço \"{espacoSelecionado.NomeFantasia}\" selecionado.");
+
+                        while (true)
+                        {
+                            Console.WriteLine("\nO que deseja fazer agora?");
+                            Console.WriteLine("1 - Cadastrar novo espaço");
+                            Console.WriteLine("2 - Editar Espaço");
+                            Console.WriteLine("3 - Excluir Espaço");
+                            Console.WriteLine("4 - Criar Reserva");
+
+                            string? escolha = Console.ReadLine()?.Trim();
+
+                            switch (escolha)
+                            {
+                                case "1":
+                                    NavegacaoAtual.Registrar(() => MenuEspacos.ListarEspacosGlobal());
+                                    EspacoControlador.CadastrarEspaco();
+                                    return;
+
+                                case "2":
+                                    EspacoControlador.EditarCadastroEspaco();
+                                    return;
+
+                                case "3":
+                                    EspacoControlador.ExcluirCadastroEspaco();
+                                    return;
+
+                                case "4":
+                                    CriarReservaControladora.IniciarComEspacoVinculado(espacoSelecionado);
+
+                                    return;
+
+                                default:
+                                    CentralSaida.Exibir(TipoMensagem.Alerta, "Opção inválida. Por favor, digite novamente.");
+                                    Console.WriteLine();
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MenuRodapeGlobal.ExibirRodapeGlobal("Catálogo de Espaços");
+            }
+        }
+
+        private static string GerarCodigoTipo(string tipoNome, HashSet<string> codigosUsados)
+        {
+            tipoNome = RemoverAcentos(tipoNome.ToUpper().Replace(" ", ""));
+            string prefixo = tipoNome.Length >= 3 ? tipoNome.Substring(0, 3) : tipoNome;
+
+            var letrasUsadas = codigosUsados
+                .Where(c => c.StartsWith(prefixo) && c.Length == 4)
+                .Select(c => c[3]) // quarta letra usada no código
+                .ToHashSet();
+
+            // Tenta usar letras do próprio nome que ainda não foram usadas
+            foreach (char letra in tipoNome.Skip(3))
+            {
+                if (!letrasUsadas.Contains(letra))
+                {
+                    string tentativa = prefixo + letra;
+                    codigosUsados.Add(tentativa);
+                    return tentativa;
                 }
             }
 
-            Console.WriteLine("\nPressione qualquer tecla para retornar ao menu...");
-            Console.ReadKey();
+            // Se todas as letras da palavra foram usadas, tenta letra aleatória
+            foreach (char letra in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            {
+                if (!letrasUsadas.Contains(letra))
+                {
+                    string tentativa = prefixo + letra;
+                    codigosUsados.Add(tentativa);
+                    return tentativa;
+                }
+            }
+
+            // Último recurso (caso todas opções estejam usadas)
+            return $"{prefixo}X";
         }
+
+        //Removeracentos: código auxiliar de GerarCodigoTipo
+        private static string RemoverAcentos(string texto)
+        {
+            var bytes = System.Text.Encoding.GetEncoding("Cyrillic").GetBytes(texto);
+            return System.Text.Encoding.ASCII.GetString(bytes);
+        }
+
+        public static EspacoHospedagem SelecionarEspaco()
+        {
+            CentralSaida.LimparTela("Selecionar Espaço");
+            CentralSaida.CabecalhoMenus("Seleção de Espaço");
+
+            if (!SessaoAtual.Espacos.Any())
+            {
+                CentralSaida.Exibir(TipoMensagem.Alerta, "Nenhum espaço disponível.");
+                EntradaHelper.ExibirMensagemRetorno("Pressione ENTER para retornar...");
+                return null!;
+            }
+
+            for (int i = 0; i < SessaoAtual.Espacos.Count; i++)
+            {
+                var espaco = SessaoAtual.Espacos[i];
+                Console.WriteLine($"[{i + 1}] {espaco.NomeFantasia} – Diária: {espaco.ValorDiaria:C}");
+            }
+
+            int? escolha = CentralEntradaInteira.LerComCancelamento("Digite o número do espaço desejado:");
+
+            if (escolha == null || escolha < 1 || escolha > SessaoAtual.Espacos.Count)
+            {
+                CentralSaida.Exibir(TipoMensagem.Alerta, "Seleção cancelada ou inválida.");
+                return null!;
+            }
+
+            return SessaoAtual.Espacos[escolha.Value - 1];
+        }
+
+
     }
+
+
 }

@@ -1,137 +1,73 @@
 using System;
+using System.Threading;
+using DesafioProjetoHospedagem.Models;
+using DesafioProjetoHospedagem.Utils;
+using DesafioProjetoHospedagem.Menus;
+using DesafioProjetoHospedagem.Controladoras;
 
 namespace DesafioProjetoHospedagem.Utils
 {
     public static class EntradaHelper
     {
-        // ======== VERSÕES BÁSICAS =========
+        // ======== MÉTODOS AUXILIARES INTERNOS =========
 
-        public static string LerTexto(string mensagem)
+        //digitou enter 3 vezes
+        private static bool ConfirmarCancelamento()
         {
-            string? entrada;
+            string? resposta;
             do
             {
-                Console.Write($"{mensagem}: ");
-                entrada = Console.ReadLine();
-            }
-            while (string.IsNullOrWhiteSpace(entrada));
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("\nVocê pressionou Enter várias vezes. Deseja cancelar e voltar ao menu atual? (S/N): ");
+                Console.ResetColor();
 
-            return entrada.Trim();
-        }
+                resposta = Console.ReadLine()?.Trim().ToUpper();
 
-        public static int LerInteiro(string mensagem)
+                if (resposta == "S") return true;
+                if (resposta == "N") return false;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Entrada inválida. Digite apenas S ou N.");
+                Console.ResetColor();
+            } while (true);
+        }       // ======== ENTRADAS BÁSICAS =========
+
+        //-----------------------------------------------------
+
+        // digitar de 1 até limite
+        private static void ExibirMensagemEntradaNumerada(string mensagem, int limite)
         {
-            int valor;
-            while (true)
-            {
-                Console.Write($"{mensagem}: ");
-                if (int.TryParse(Console.ReadLine(), out valor))
-                    return valor;
-
-                Console.WriteLine("Valor inválido. Tente novamente.");
-            }
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write($"\n{mensagem} (entre 1 e {limite}): ");
+            Console.ResetColor();
         }
 
-        public static decimal LerDecimal(string mensagem)
+        //0 para voltar, até limite
+        private static void ExibirMensagemEntrada(string mensagem, int limite)
         {
-            decimal valor;
-            while (true)
-            {
-                Console.Write($"{mensagem}: ");
-                if (decimal.TryParse(Console.ReadLine(), out valor))
-                    return valor;
-
-                Console.WriteLine("Valor inválido. Tente novamente.");
-            }
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write($"\n{mensagem} (0 para voltar, até {limite}): ");
+            Console.ResetColor();
         }
 
-        // ======== VERSÕES COM CANCELAMENTO =========
-
-        public static string? LerTextoComCancelamento(string mensagem, int maxVazios = 3)
+        public static void ExibirMensagemRetorno(
+    string mensagem = "Operação concluída com sucesso.",
+    string nomeMenu = "Menu",
+    Action? voltarParaSubmenu = null
+)
         {
-            int vazios = 0;
-            while (true)
-            {
-                Console.Write($"{mensagem}: ");
-                string? entrada = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\n{mensagem}");
+            Console.ResetColor();
 
-                if (!string.IsNullOrWhiteSpace(entrada))
-                    return entrada.Trim();
-
-                vazios++;
-
-                if (vazios >= maxVazios)
-                {
-                    Console.Write("\nVocê pressionou Enter várias vezes. Deseja cancelar e voltar ao menu atual? (S/N): ");
-                    string resposta = Console.ReadLine()!.Trim().ToUpper();
-                    if (resposta == "S")
-                        return null;
-
-                    vazios = 0;
-                }
-            }
+            MenuRodape.ExibirRodape(
+                nomeMenu,
+                aoVoltarParaSubmenu: voltarParaSubmenu ?? (() => NavegacaoAtual.Voltar()),
+                aoVoltarMenuPrincipal: () => MenuPrincipal.ExibirPrincipal()
+            );
         }
 
-        public static int? LerInteiroComCancelamento(string mensagem, int maxVazios = 3)
-        {
-            int vazios = 0;
-            while (true)
-            {
-                Console.Write($"{mensagem}: ");
-                string? entrada = Console.ReadLine();
 
-                if (!string.IsNullOrWhiteSpace(entrada) && int.TryParse(entrada, out int valor))
-                    return valor;
 
-                if (string.IsNullOrWhiteSpace(entrada))
-                {
-                    vazios++;
-                    if (vazios >= maxVazios)
-                    {
-                        Console.Write("\nVocê pressionou Enter várias vezes. Deseja cancelar e voltar ao menu atual? (S/N): ");
-                        string resposta = Console.ReadLine()!.Trim().ToUpper();
-                        if (resposta == "S")
-                            return null;
-
-                        vazios = 0;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Valor inválido. Tente novamente.");
-                }
-            }
-        }
-
-        public static decimal? LerDecimalComCancelamento(string mensagem, int maxVazios = 3)
-        {
-            int vazios = 0;
-            while (true)
-            {
-                Console.Write($"{mensagem}: ");
-                string? entrada = Console.ReadLine();
-
-                if (!string.IsNullOrWhiteSpace(entrada) && decimal.TryParse(entrada, out decimal valor))
-                    return valor;
-
-                if (string.IsNullOrWhiteSpace(entrada))
-                {
-                    vazios++;
-                    if (vazios >= maxVazios)
-                    {
-                        Console.Write("\nVocê pressionou Enter várias vezes. Deseja cancelar e voltar ao menu atual? (S/N): ");
-                        string resposta = Console.ReadLine()!.Trim().ToUpper();
-                        if (resposta == "S")
-                            return null;
-
-                        vazios = 0;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Valor inválido. Tente novamente.");
-                }
-            }
-        }
     }
 }

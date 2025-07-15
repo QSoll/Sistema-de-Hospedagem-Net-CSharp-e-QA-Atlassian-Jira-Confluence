@@ -1,8 +1,29 @@
 {
-	"editor.defaultFormatter": "formulahendry.auto-close-tag",
-	"notebook.defaultFormatter": "formulahendry.auto-close-tag",
-	"[csharp]": {
-		"editor.defaultFormatter": "ms-dotnettools.csharp"
-	},
-	"editor.mouseWheelZoom": true
+
+	// FORMATADORES
+  "editor.defaultFormatter": "ms-dotnettools.csharp",
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  },
+
+  // ZOOM DO EDITOR
+  "editor.mouseWheelZoom": true,
+
+  // EXIBIÇÃO DE LINHA DE CÓDIGO E ESPAÇAMENTO
+  "editor.lineNumbers": "on",
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+
+  // BUSCA GLOBAL SEM LIMITES
+  "search.exclude": {
+    "**/node_modules": true,         // mantém node_modules fora
+    "**/bin": false,                 // inclui /bin na busca
+    "**/obj": false,                 // inclui /obj na busca
+    "**/.vscode": false              // busca também na pasta do VS Code se quiser
+  },
+  "search.useGlobalIgnoreFiles": false,  // ignora .gitignore e similares durante a busca
+
+  // TERMINAL MAIS LIMPO (opcional)
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.cursorBlinking": true
 }
