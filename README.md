@@ -6,10 +6,29 @@ Projetado com foco em **resiliência de entrada**, **experiência do usuário no
 Ideal para hotéis, pousadas e centros de hospedagem.
 
 <img src="QA/Sistema_de_hospedagem_mapa_em_arvore.png">
+----------------------------------------------------
+
+QA - Utilizando Atlassian / Jira e Confluence
+
+1- Casos de teste BDD
+
+2- Casos de teste step-by-step
+
+3- MindMap
+
+4- Plano de fluxo de bug
+
+5- Relatórios Atlassian
+
+6- User stories
+
+----------------------------------------------------
+
+Características do sistema
 
 ## Entrada Segura (`EntradaHelper.cs`)
 
-- Cancelamento com Enter repetido
+- Ação de direcionamento do usuário após pressionar 3x Enter
 - Validações inteligentes de texto, números e e-mails
 - Confirmação Sim/Não padronizada
 - Nome sugerido com override
@@ -56,7 +75,7 @@ Ideal para hotéis, pousadas e centros de hospedagem.
 ### Listagem
 - Espaços com status de ocupação
 - Reservas por status
-- Hóspedes por nome parcial
+- Clientes cadastrados, clientes hospedados (hóspedes), clientes não hospedados
 
 ### Cancelamento e Exclusões
 - Exclusões protegidas por confirmação
@@ -85,7 +104,7 @@ Todas as operações possuem validação, confirmação ou retorno visual.
 
 ## Conclusão
 
-Sistema pronto para produção:
+Sistema em fase de testes e correções, quase pronto para produção:
 
 - ✅ Modular e organizado
 - ✅ Interface amigável
