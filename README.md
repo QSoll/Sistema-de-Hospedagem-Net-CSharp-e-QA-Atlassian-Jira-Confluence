@@ -1,4 +1,4 @@
-<img src="QA/resort.png">
+<img src="QA/resorte1.png">
 
 ## Sistema de Gerenciamento de Hospedagem
 
