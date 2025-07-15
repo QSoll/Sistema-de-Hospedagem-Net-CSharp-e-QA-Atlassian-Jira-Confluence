@@ -7,6 +7,8 @@ Projetado com foco em **resiliência de entrada**, **experiência do usuário no
 
 Ideal para hotéis, pousadas e centros de hospedagem.
 
+Bootccamp <a href="https://www.dio.me/" target= "_blank"><img src="logo_dio.jpg"> e <a href="https://www.wexinc.com/pt-br/" target= "_blank"><img src="logo_wex.jpg"></a> - End to End Engineering
+
 <img src="QA/Sistema_de_hospedagem_mapa_em_arvore.png">
 ----------------------------------------------------
 
