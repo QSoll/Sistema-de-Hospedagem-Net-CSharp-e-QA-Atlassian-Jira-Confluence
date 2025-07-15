@@ -1,3 +1,5 @@
+<img src="QA/resort.png">
+
 ## Sistema de Gerenciamento de Hospedagem
 
 Um sistema de terminal em C# para gerenciar espaços, hóspedes, reservas e emissão de comprovantes.  
