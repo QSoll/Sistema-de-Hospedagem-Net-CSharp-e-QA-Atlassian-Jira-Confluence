@@ -129,7 +129,7 @@ Sistema em fase de testes e correções, quase pronto para produção:
 ## ▶️ Como executar
 
 1. Clone o repositório:  
-   `git clone https://github.com/QSoll/SistemaHospedagem.git`
+   `git clone https://github.com/QSoll/SistemaHospedagem.git](https://github.com/QSoll/Sistema-de-Hospedagem-Net-CSharp-e-QA-Atlassian-Jira-Confluence.git`
 
 2. Abra o projeto no Visual Studio ou VS Code
 
